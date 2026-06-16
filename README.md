@@ -11,6 +11,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Groq](https://img.shields.io/badge/Groq-Llama_3.3_70B-F55036?style=for-the-badge)](https://groq.com)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
 [![Vercel](https://img.shields.io/badge/Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com)
 
 <br/>
@@ -32,154 +33,66 @@ After **3 structured rounds**, a completely separate AI judge evaluates the enti
         ↓
 🤖 AI fires back with a real counter-argument  
         ↓
-🔁 Repeat for 3 rounds
+🔁 Repeat for 3 rounds (Opening → Rebuttal → Closing)
         ↓
 ⚖️  Independent AI judge evaluates everything
         ↓
-🏆 Winner declared · Scores · Fallacies detected
+🏆 Winner declared · Scores · Fallacies detected · Shareable verdict link
 ```
 
 ---
 
-## ✨ Features
+## ✨ What's Inside
 
-### 🥊 Core Debate
-| Feature | Description |
-|---------|-------------|
-| 🌍 **Any topic** | Type literally anything — "AI will replace programmers", "pineapple belongs on pizza", anything |
-| 🎲 **Side selection** | Argue FOR, AGAINST, or let the app assign randomly |
-| 🔄 **3-round structure** | Opening → Rebuttal → Closing |
-| 🎤 **Random first mover** | AI sometimes opens — keeps it unpredictable |
-| ✍️ **400 char limit** | Forces concise, structured thinking |
-
-### ⚖️ AI Judge
-- 🧠 **Completely independent** — separate Groq call, never sees the debater's instructions
-- 📊 **4-axis scoring** — Logic, Evidence, Rebuttal Quality, Clarity (each /10)
-- 🏆 **Winner declaration** with specific reasoning
-- 💬 **Strongest argument** highlight from the entire debate
-- ⚠️ **Logical fallacy detection** — ad hominem, strawman, false dichotomy, and more
-
-### 🔬 Argument Analyser
-- ⚡ **Real-time feedback** — fires in parallel, doesn't slow you down
-- 📈 **Claim strength + evidence quality** scores per argument
-- 🎭 **Emotional vs logical** tone detection
-- 🚩 **Filler phrase detection** — catches "I think maybe", "sort of", "probably"
-- 🎯 **Predicts AI's next move** — tells you what the AI will target in rebuttal
-
-### 👥 2 Player Mode
-- 🤝 Two humans debate on the **same machine**
-- 🔒 **Screen blurs between turns** — pass the device, no peeking
-- 📊 AI analyses **both** players' arguments independently
-- ⚖️ Same judge system, same fairness
-
-### 🎨 Polish
-- ✨ Framer Motion animations on every interaction
-- 📸 **Downloadable result card** (PNG)
-- 📄 **PDF export** of full debate transcript
-- 🔄 **Side Flip mode** — replay arguing the other position
-- 📚 **Debate history** saved locally
-- 🏷️ Topic suggestions with **difficulty ratings**
+- **VS AI** — debate any topic against Llama 3.3 70B arguing the opposite side
+- **Local 2 Player** — two humans, one device, screen blurs between turns
+- **Online PvP** — real-time multiplayer via Supabase Realtime, share a link to invite anyone
+- **AI Judge** — independent LLM scores logic, evidence, rebuttal, and clarity across both sides
+- **Argument Analyser** — fires in parallel per round, gives coaching feedback on your argument
+- **Global Leaderboard** — ranked by win rate, total wins, or avg score
+- **Shareable verdicts** — send any completed debate result to anyone, no login required
+- **Trending topics** — live debate topics pulled fresh via Groq web search
 
 ---
 
-## 🧠 Multi-Agent Architecture
+## 🧠 How It Works
 
-Three distinct AI agents, each with a separate system prompt and role in the pipeline:
+Three distinct AI agents with separate system prompts run in a pipeline:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    User submits argument                 │
-└──────────────────────────┬──────────────────────────────┘
-                           │
-              ┌────────────┴────────────┐
-              ▼                         ▼
-     🤖 DEBATER AGENT           🔬 ANALYSER AGENT
-     Argues opposite side       Scores your argument
-     Temperature: 0.8           Temperature: 0.3
-     (fires in parallel, non-blocking)
-              │
-              ▼
-     After Round 3 only:
-     ⚖️  JUDGE AGENT
-     Evaluates full transcript
-     Returns structured JSON
-     Temperature: 0.2
+🤖 DEBATER — argues the opposite side with conviction   (temp 0.8)
+🔬 ANALYSER — scores your argument in parallel          (temp 0.3)
+⚖️  JUDGE   — evaluates the full transcript after R3    (temp 0.2)
 ```
 
-> **Key design decision:** Fully **stateless API** — every request sends the complete conversation history. No server-side session state, no bugs on refresh, scales horizontally with zero changes.
+Fully **stateless API** — every request sends the complete conversation history. No server-side session state.
 
 ---
 
 ## 🛠️ Tech Stack
 
-```
-🎨 Frontend                  ⚙️  Backend                🤖 AI
-──────────────               ─────────────              ─────────────
-Next.js 15                   FastAPI                    Groq API
-Tailwind CSS                 Python 3.11                Llama 3.3 70B
-Framer Motion                Pydantic                   3 system prompts
-html2canvas                  Uvicorn
-jsPDF
-
-💾 Storage                   🚀 Deployment
-──────────────               ─────────────
-localStorage (v1)            Vercel  → Frontend
-                             Render  → Backend API
-```
-
----
-
-## 📁 Project Structure
-
-```
-agAInst/
-│
-├── 🎨 frontend/
-│   ├── app/
-│   │   ├── 🏠 page.tsx                 # Landing page
-│   │   ├── ⚔️  debate/[id]/page.tsx    # Debate arena
-│   │   ├── ⚖️  verdict/[id]/page.tsx   # Judge panel
-│   │   ├── 👥 pvp/[id]/page.tsx        # 2 Player arena
-│   │   ├── 🏆 pvp/verdict/[id]/        # 2 Player verdict
-│   │   └── 📚 history/page.tsx         # Past debates
-│   ├── components/
-│   │   └── 🔬 AnalysisPanel.tsx        # Per-argument breakdown
-│   └── lib/
-│       ├── 🔌 api.ts                   # FastAPI client
-│       ├── 📝 types.ts                 # TypeScript interfaces
-│       ├── 💾 storage.ts               # localStorage helpers
-│       └── 🏷️  topics.ts               # Curated topic list
-│
-└── ⚙️  backend/
-    ├── 🚀 main.py                      # FastAPI app + CORS
-    ├── routers/
-    │   └── 🛣️  debate.py               # /argue /judge /analyse /pvp/judge
-    ├── services/
-    │   ├── 🤖 groq_client.py           # Groq SDK wrapper
-    │   └── 📋 prompts.py               # System prompts
-    └── models/
-        └── 📐 schemas.py               # Pydantic schemas
-```
+| Layer | Tech |
+|-------|------|
+| Frontend | Next.js 15, Tailwind CSS, Framer Motion |
+| Backend | FastAPI, Python 3.11, slowapi (rate limiting) |
+| AI | Groq API — Llama 3.3 70B |
+| Database | Supabase (Postgres, Auth, Realtime, Storage) |
+| Deployment | Vercel (frontend) · Render (backend) |
 
 ---
 
 ## 🚀 Running Locally
 
 ### Prerequisites
-- Node.js 18+
-- Python 3.11+
-- A [Groq API key](https://console.groq.com) (free tier available)
+- Node.js 18+ · Python 3.11+
+- [Groq API key](https://console.groq.com) (free)
+- [Supabase](https://supabase.com) project (free)
 
-### ⚙️ Backend Setup
+### Backend
 
 ```bash
 cd backend
-
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate       # Windows: .venv\Scripts\activate
-
-# Install dependencies
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -189,14 +102,10 @@ GROQ_API_KEY=your_key_here
 ```
 
 ```bash
-# Start the server
 uvicorn main:app --reload --port 8000
 ```
 
-✅ Backend running at `http://localhost:8000`  
-✅ API docs at `http://localhost:8000/docs`
-
-### 🎨 Frontend Setup
+### Frontend
 
 ```bash
 cd frontend
@@ -206,76 +115,66 @@ npm install
 Create `frontend/.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ```bash
 npm run dev
 ```
 
-✅ App running at `http://localhost:3000`
+✅ `http://localhost:3000`
 
 ---
 
 ## 🌐 Deployment
 
-| | Platform | Configuration |
-|--|----------|---------------|
-| 🎨 **Frontend** | Vercel | Root dir: `frontend` |
-| ⚙️ **Backend** | Render | Root dir: `backend` · Start: `uvicorn main:app --host 0.0.0.0 --port $PORT` |
+| | Platform | Notes |
+|--|----------|-------|
+| Frontend | Vercel | Root dir: `frontend` |
+| Backend | Render | Root dir: `backend` · Start: `uvicorn main:app --host 0.0.0.0 --port $PORT` |
 
-**Environment variables:**
-- Render → `GROQ_API_KEY`
-- Vercel → `NEXT_PUBLIC_API_URL` (your Render URL)
-
----
-
-## 💼 Why This Is Interesting (For Interviews)
-
-> *"Pick any topic — any topic at all."*
-
-That's the demo opener. Nobody forgets it.
-
-But beyond the demo moment, here's what this project actually demonstrates:
-
-| Concept | Implementation |
-|---------|----------------|
-| 🧠 **Multi-agent AI** | Three LLMs with distinct roles — debater, judge, analyser — in one pipeline |
-| ⚡ **Parallel async** | Analyser fires alongside debater via `Promise.all` — no added latency |
-| 📊 **Structured LLM output** | Judge returns typed JSON with validation + retry logic on parse failure |
-| 🔄 **Stateless API design** | Full context passed per request — no server-side state |
-| 🚀 **Full-stack deployment** | Separate frontend/backend on different platforms, wired via env vars |
-| 🎨 **Production UI** | Framer Motion, real-time feedback, shareable cards, PDF export |
+**Env vars:** Render → `GROQ_API_KEY` · Vercel → `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ---
 
 ## 🗺️ Roadmap
 
-- [x] 🥊 Core 3-round debate loop
-- [x] ⚖️ AI judge with structured JSON scoring
-- [x] 🔬 Real-time argument analyser
-- [x] 🔄 Side Flip mode
-- [x] 👥 2 Player mode
-- [x] 📸 Shareable result card + PDF export
-- [x] 📚 Local debate history
-- [x] 🔥 Trending topics via web search
-- [x] 👤 User accounts + cloud history
-- [x] 🏆 Global leaderboard
-- [ ] 🎙️ Voice input support
+- [x] Core 3-round VS AI debate loop
+- [x] AI judge with structured JSON scoring + fallacy detection
+- [x] Real-time argument analyser (parallel, non-blocking)
+- [x] Local 2 Player mode with handoff screen
+- [x] Online PvP with Supabase Realtime + share links
+- [x] User accounts, cloud sync, guest migration
+- [x] Global leaderboard (3 sort modes)
+- [x] Shareable verdict links (public, no login required)
+- [x] Rate limiting on all LLM endpoints
+- [x] Side Flip mode · PDF export · Shareable result card
+- [ ] Voice input
+- [ ] ELO rating system
+
+---
+
+## 🔒 Source Code
+
+The full source code is available on request. If you'd like to review it — reach out and I'll grant access.
+
+📧 [theprakhar211@gmail.com](mailto:theprakhar211@gmail.com) · 💼 [LinkedIn](https://www.linkedin.com/in/prakhar-sharma-21112004-)
 
 ---
 
 ## 📄 License
 
-MIT — use it, fork it, build on it.
+MIT
 
 ---
 
 <div align="center">
 
-**Built by [Prakhar](https://github.com/theprakhar211)**
+**Built by [Prakhar Sharma](https://github.com/theprakhar211)** · [Portfolio](https://prakhar-sharma.vercel.app)
 
 ⚔️ *Challenge your thinking. Sharpen your arguments. Win the debate.*
 
-<sub>Made with Next.js · FastAPI · Groq · Llama 3.3 70B</sub>
+<sub>Next.js · FastAPI · Groq · Supabase · Llama 3.3 70B</sub>
 
 </div>
